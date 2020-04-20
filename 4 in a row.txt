@@ -1,0 +1,225 @@
+#include <stdio.h>
+#include<stdbool.h> 
+bool tai (bool gameOver,char bordGame[6][7]);
+void printbord (char bordGame[6][7]);
+void Undo (char bordGame[6][7],int flags[8]);
+bool CheakBord (bool gameOver, char bordGame[6][7],char coin);
+bool playerX (bool gameOver, char bordGame[6][7],int flags[8]);
+bool playerO (bool gameOver, char bordGame[6][7],int flags[8]);
+void pushCoin (double parameter,char bordGame[6][7] ,char coin,int flags[]);
+bool BordEmpty (char bordGame[6][7]);
+int count=0; int undo [6][7];
+int main ()
+{
+   printf ("welcome!\n this is the game 4 in row! now start to play!\n\n");
+   printf ("to rival1 : your coins signs are 'X' \n");
+   printf ("to rival2 : your coins signs are 'O' \n");
+   
+    char bordGame[6][7]= {{'|','|','|','|','|','|','|'},{'|','|','|','|','|','|','|'},{'|','|','|','|','|','|','|'},{'|','|','|','|','|','|','|'},{'|','|','|','|','|','|','|'},{'|','|','|','|','|','|','|'} ,{'|','|','|','|','|','|','|'}};
+    
+    int flags[7]= {5,5,5,5,5,5,5};
+    printbord(bordGame);
+      bool gameOver = false;
+
+   while (gameOver!=true)
+  { 
+        gameOver= playerX(gameOver,bordGame,flags);
+        if(gameOver!=true)
+        {
+        gameOver= playerO(gameOver,bordGame,flags);
+        }
+  }  
+  printf("byebye");
+  
+   return 0;
+}
+//==================================================================================
+bool playerX (bool gameOver,char bordGame[6][7],int flags[8])
+{
+        printf("\n");
+        char coin ='X';
+        printf ("turn: Player X, please enter a number (or 0 to undo)\n");
+
+         double parameter=0; 
+         int parameter1=0;
+         static int parameter2;
+  
+          if (scanf ("%lf", &parameter)!= 1)
+          return gameOver=true;
+          
+          
+          if ((( parameter2!= 0) || ( sizeof(parameter)%4!= 0) ||(sizeof(parameter)%8!= 0)))
+          return gameOver =true; 
+          
+         if (( parameter <0) | ( parameter>7))
+         {
+          printf ("Invalid input, the number must be between 1 to 7:\n");
+          scanf("%lf",&parameter);
+         }
+         
+          parameter1 = (int)parameter;
+          parameter2 =(int) (parameter*10)%10;
+  
+           if (parameter==0)
+          {
+           if( BordEmpty (bordGame))
+           {  printf ("Board is empty - can't undo!\n");
+    
+             gameOver= playerX(gameOver,bordGame,flags);
+           }
+            Undo( bordGame,flags );
+            gameOver= playerO (gameOver, bordGame,flags);
+          }
+          
+         if ( parameter1 !=0 )
+        {
+         pushCoin (parameter1,bordGame,coin,flags);
+         
+         return gameOver= CheakBord(gameOver,bordGame,coin);
+      
+         return gameOver = tai(gameOver,bordGame);
+        }
+         return gameOver=  playerO (gameOver,bordGame,flags);
+}
+//============================================================================
+bool playerO (bool gameOver, char bordGame[6][7],int flags[8])
+{
+        printf("\n");
+        char coin ='O';
+        printf ("turn: Player O, please enter a number (or 0 to undo)\n");
+
+         double parameter=0; 
+         int parameter1=0;
+         static int parameter2;
+
+          if (scanf ("%lf", &parameter)!= 1)
+          return gameOver=true;
+         
+         if ((( parameter2!= 0) || ((sizeof(parameter)%4)!= 0) || ((sizeof(parameter)%8 )!= 0)))
+         
+         return gameOver =true; 
+  
+        
+         if (( parameter <0) | ( parameter>7))
+         {
+          printf ("Invalid input, the number must be between 1 to 7:\n");
+          scanf("%lf",&parameter);
+         }
+         
+          parameter1 = (int)parameter;
+          parameter2 =(int) (parameter*10)%10;
+
+         if (parameter==0)
+         {
+           if( BordEmpty (bordGame))
+           {
+           printf ("Board is empty - can't undo!\n");
+           gameOver= playerO( gameOver,bordGame,flags);
+           } 
+           Undo( bordGame,flags);
+           gameOver= playerX (gameOver, bordGame,flags);
+          }
+
+          if ( parameter1 !=0 )
+         {
+           pushCoin (parameter1,bordGame,coin,flags);
+     
+           return gameOver = CheakBord(gameOver,bordGame,coin);
+     
+           return gameOver = tai(gameOver,bordGame);
+
+           return gameOver = playerX (gameOver, bordGame,flags);
+         }
+}
+//========================================================================
+void printbord (char bordGame[6][7])
+{
+   for (int i =0;i<6 ; i++)
+   {
+      for(int j =0 ;j<7 ; j++)
+       {
+         printf("%c ",bordGame[i][j]);
+        }
+        printf ("\n");
+       }
+      for (int i =1;i<=7 ; i++)
+     { 
+       printf ("%d ",i);
+     }
+     printf ("\n\n\n");
+}
+//===================================================================================
+void Undo (char bordGame[6][7] ,int flags[8])
+{
+      if (count ==0)
+      {
+        printf ("Board is empty - can't !\n"); 
+        }else {
+         for (int i =0;i<6 ; i++)
+        {
+         for(int j =0 ;j<7 ; j++)
+        {
+         if( undo[i][j]==count-1)
+         {  
+             undo[i][j]=0;
+            bordGame[i][j]='|';
+             flags[j]++;
+         }   
+       }
+      }
+    }
+         printbord(bordGame);
+         count-- ; 
+}
+//============================================================================================
+void pushCoin (double parameter,char bordGame[6][7] ,char coin,int flags[8])
+ {
+     for ( int i = 0 ; i<7 ;i++)
+     {
+          if ( i == parameter-1)
+         {
+          bordGame [flags[i]][i]= coin;
+          undo[flags[i]][i]= count;
+          flags[i]--;  
+          count++;
+          break;
+          }   
+     }
+     printbord(bordGame);
+ }
+//========================================================================================
+bool BordEmpty (char bordGame[6][7])
+{
+      if (count==0){ return true;}
+   
+   else{ return false;}
+}
+//==========================================================================================
+bool CheakBord (bool gameOver,char bordGame[6][7],char coin)
+{ 
+     for ( int i =0 ; i <6 ; i++)
+     {
+      for(int j =0 ;j<7 ; j++)
+     {  
+        if((((bordGame[i][j]==coin)&&(bordGame[i][j+1]==coin)&& (bordGame[i][j+2]== coin) &&(bordGame[i][j+3] ==coin))
+        || (( bordGame[i][j] ==coin) &&(bordGame[i+1][j]==coin) &&(bordGame[i+2][j]==coin) &&(bordGame[i+3][j] ==coin )) 
+        ||( ( bordGame[i][j]==coin) &&(bordGame[i+1][j+1]==coin) &&(bordGame[i+2][j+2]==coin)&& (bordGame[i+3][j+3]))) 
+                ||( ( bordGame[i][j]==coin) &&(bordGame[i-1][j+1]==coin) &&(bordGame[i-2][j+2]==coin)&& (bordGame[i-3][j+3]) ))
+       {    
+         printf ("Player %c wins!\n",coin );
+         return gameOver=true ;
+     }
+     }
+   }
+ return gameOver=false;
+}
+//=============================================
+bool tai (bool gameOver,char bordGame[6][7])
+{
+if (count==42)
+ {
+   printf("it's a tai! ");
+   return gameOver=true;
+   
+}else{ gameOver=false;}
+}
